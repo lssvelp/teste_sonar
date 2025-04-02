@@ -22,6 +22,6 @@ jobs:
       - name: Build and analyze with SonarQube
         run: |
           mvn clean verify sonar:sonar \
-            -Dsonar.projectKey=SEU_PROJETO_KEY \
-            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+            -Dsonar.projectKey=sqa_d36ab7901615872b85524716716629af43eb9fec \
+            -Dsonar.host.url=${{ secrets.http://localhost:9000 }} \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
