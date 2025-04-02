@@ -3,86 +3,100 @@ import java.sql.*;
 
 public class Main {
     
-    // 1. Uso de campo público (violação de encapsulamento)
-    public String nome;
+    // 1. Campo público sem encapsulamento
+    public String nome = "teste";
     
-    // 2. Uso de variável estática não final
-    private static int contador = 0;
+    // 2. Variável estática mutável
+    public static int contador = 0;
     
-    // 3. Conexão SQL não fechada (problema de resource leak)
-    public List<String> getNomesDoBanco() {
+    // 3. Constante não final
+    public static String CONSTANTE = "VALOR";
+    
+    // 4. Conexão SQL com vazamento de recursos
+    public List<String> getNomesDoBanco() throws SQLException {
         List<String> nomes = new ArrayList<>();
+        Connection conn = null;
         try {
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?user=root&password=123456");
             Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT nome FROM pessoas");
+            ResultSet rs = stmt.executeQuery("SELECT nome FROM pessoas WHERE id = " + System.getenv("USER_ID")); // SQL Injection
             
             while(rs.next()) {
-                nomes.add(rs.getString("nome"));
+                nomes.add(rs.getString(1)); // Uso de índice numérico
             }
-            // 4. Falta fechar rs, stmt e conn (SQL resource leak)
         } catch (SQLException e) {
-            // 5. Logging inadequado (apenas printStackTrace)
-            e.printStackTrace();
+            System.out.println("Erro: " + e); // Logging inadequado
         }
         return nomes;
     }
     
-    // 6. Método complexo com muitas responsabilidades
+    // 5. Método complexo com muitas responsabilidades
     public void processarTudo(String input) {
-        if(input != null) {
-            // 7. Uso de == para comparar strings
-            if(input == "SPECIAL") {
-                System.out.println("Input especial");
-            } else {
-                // 8. Concatenação de strings em loop
-                String result = "";
-                for(int i = 0; i < 100; i++) {
-                    result += input;
-                }
-                System.out.println(result);
+        if(input == null) return;
+        
+        // 6. Comparação de strings com ==
+        if(input == "SPECIAL") {
+            System.out.println("Input especial");
+        } else {
+            // 7. Concatenação ineficiente em loop
+            String result = "";
+            for(int i = 0; i < 100; i++) {
+                result += input; // Deveria usar StringBuilder
             }
-            
-            // 9. Uso de número mágico
-            if(input.length() > 50) {
-                System.out.println("Input muito longo");
-            }
+            System.out.println(result);
         }
         
-        return;
+        // 8. Número mágico
+        if(input.length() > 50) {
+            System.out.println("Input muito longo");
+        }
+        
+        // 9. Dead store
+        int x = 10;
+        x = 20;
     }
     
-    // 11. Duplicação de código (método quase idêntico ao anterior)
+    // 10. Duplicação de código
     public void processarTudoNovamente(String input) {
-        if(input != null) {
-            if(input == "SPECIAL") {
-                System.out.println("Input especial");
-            } else {
-                String result = "";
-                for(int i = 0; i < 100; i++) {
-                    result += input;
-                }
-                System.out.println(result);
+        if(input == null) return;
+        
+        if(input == "SPECIAL") {
+            System.out.println("Input especial");
+        } else {
+            String result = "";
+            for(int i = 0; i < 100; i++) {
+                result += input;
             }
-            
-            if(input.length() > 50) {
-                System.out.println("Input muito longo");
-            }
+            System.out.println(result);
         }
         
-        return;
+        if(input.length() > 50) {
+            System.out.println("Input muito longo");
+        }
     }
     
-    // 12. Método não utilizado (dead code)
-    private String metodoNuncaUsado() {
-        return "inútil";
+    // 11. Método nunca usado
+    private String metodoInutil() {
+        return "nunca usado";
     }
     
-    // 13. Exceção genérica (deveria ser mais específica)
-    public void metodoPerigoso() throws Exception {
-        // 14. Ignorando exceção
+    // 12. Exceção genérica
+    public void metodoCritico() throws Exception {
         try {
-            int x = 10 / 0;
-        } catch (Exception e) {}
+            int y = 100 / 0;
+        } catch (Exception e) {
+            // 13. Exceção ignorada
+        }
     }
+    
+    // 14. Uso de vetor desnecessário
+    public void exemploArray() {
+        int[] nums = new int[10];
+        for(int i = 0; i <= 10; i++) { // 15. Possível ArrayIndexOutOfBounds
+            nums[i] = i;
+        }
+    }
+    
+    // 16. Método vazio
+    public void naoFazNada() {}
 }
